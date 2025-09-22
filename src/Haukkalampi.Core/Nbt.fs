@@ -79,7 +79,7 @@ type NbtElement =
             | NbtCompound value ->
                 for key, child in Map.toSeq value do
                     do! child.EncodeNamed writer key
-                do! NbtEnd.Encode writer
+                do! writer.WriteU8 NbtEnd.NbtTag
             | NbtIntArray value ->
                 do! writer.WriteI32(List.length value)
                 for x in value do
