@@ -14,13 +14,12 @@ type ResultBuilder<'E> internal() =
 
     member _.For(ts: seq<'T>, transform: 'T -> Result<unit, 'E>): Result<unit, 'E> =
         let rec inner (e: System.Collections.Generic.IEnumerator<'T>) =
-            match transform e.Current with
-            | Ok() ->
-                if e.MoveNext() then
-                    inner e
-                else
-                    Ok()
-            | Error e -> Error e
+            if e.MoveNext() then
+                match transform e.Current with
+                | Ok() -> inner e
+                | Error e -> Error e
+            else
+                Ok()
         ts.GetEnumerator() |> inner
 
     member _.Combine(left: Result<unit, 'E>, right: unit -> Result<'T, 'E>): Result<'T, 'E> =
