@@ -104,12 +104,23 @@ type LevelGenerator(parameters: LevelGenerationParameters, level: Level) =
                     level.SetTile pos Tile.Sand
 
     member this.Generate() =
+        printfn "=== Generating level ==="
+        printfn "Noise Seed: %d" parameters.NoiseSeed
+        printfn "Random Seed: %d" parameters.RandomSeed
+        printfn "Level Size: %dx%dx%d" level.Size.Width level.Size.Height level.Size.Depth
+        printfn "Water Level: %d" parameters.WaterLevel
+        printfn "========================"
+        printfn "Shaping..."
         this.Shape()
+        printfn "Warping..."
         this.Warp()
         recalculateHeights()
+        printfn "Carving..."
         this.Carve()
+        printfn "Soiling..."
         this.Soil()
         recalculateHeights()
+        printfn "Flooding..."
         this.Flood()
 
     interface IGeneratingLevelView with
