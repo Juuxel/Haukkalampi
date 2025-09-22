@@ -1,4 +1,4 @@
-module Haukkalampi.Level.Generation.Noise.Builtin
+module Haukkalampi.Level.Generator.Noise.Builtin
 
 open Haukkalampi.Level.Generator
 open NoiseFunction

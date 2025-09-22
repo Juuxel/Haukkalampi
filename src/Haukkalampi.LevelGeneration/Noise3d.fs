@@ -1,4 +1,4 @@
-namespace Haukkalampi.Level.Generation.Noise
+namespace Haukkalampi.Level.Generator.Noise
 
 open Haukkalampi.Core.Math
 open Haukkalampi.Level.Generator

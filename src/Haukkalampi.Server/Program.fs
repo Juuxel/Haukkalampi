@@ -1,7 +1,7 @@
 ﻿open Haukkalampi.Core.Io
 open Haukkalampi.Core.Math
 open Haukkalampi.Level
-open Haukkalampi.Level.Generation
+open Haukkalampi.Level.Generator
 open Haukkalampi.Player
 open Haukkalampi.Protocol.Packet
 open Haukkalampi.Tile

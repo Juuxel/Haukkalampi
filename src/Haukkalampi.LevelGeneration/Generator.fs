@@ -1,4 +1,4 @@
-namespace Haukkalampi.Level.Generation
+namespace Haukkalampi.Level.Generator
 
 open Haukkalampi.Core.Math
 open Haukkalampi.Level
