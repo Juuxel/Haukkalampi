@@ -4,7 +4,6 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Octree.fs" />
     <Compile Include="Tile.fs" />
     
     <Compile Include="Player.fs" />

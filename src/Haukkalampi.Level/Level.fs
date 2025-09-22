@@ -1,7 +1,6 @@
 ﻿namespace Haukkalampi.Level
 
 open Haukkalampi.Core.Math
-open Haukkalampi.Octree
 open Haukkalampi.Player
 open Haukkalampi.Tile
 open System.Collections.Generic
