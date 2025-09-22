@@ -34,7 +34,7 @@ let createBaseLayer seed: NoiseFunction =
     |> clampLayer -1 1
     |> shiftLayer 11 shiftX shiftZ
 
-let createWarpLayer (level: IGeneratingLevelView) seed: NoiseFunction3D =
+let createWarpLayer (level: IReadableGeneratingLevel) seed: NoiseFunction3D =
     let shiftSource = baseLayer seed |> scaleLayer 0.02 0.02
     let shiftX = shiftSource |> offsetLayer -1024 1024 |> adaptingLayer3D
     let shiftY = shiftSource |> offsetLayer -4192 2048 |> adaptingLayer3D

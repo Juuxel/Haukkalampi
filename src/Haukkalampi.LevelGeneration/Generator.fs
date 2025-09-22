@@ -28,7 +28,7 @@ type LevelGenerator(parameters: LevelGenerationParameters, level: Level) =
                 for feature, placer in features do
                     let positions = placer.Place this origin random
                     for pos in positions do
-                        feature.Generate level pos random
+                        feature.Generate this pos random
 
     member private _.Shape() =
         let noiseLayer =
@@ -103,6 +103,40 @@ type LevelGenerator(parameters: LevelGenerationParameters, level: Level) =
                     let pos = { X = x; Y = topY; Z = z }
                     level.SetTile pos Tile.Sand
 
+    member private this.Plant() =
+        let flowerPlacer count =
+            ChainedPlacer [
+                ChancePlacer 0.4f
+                SpreadPlacer.InChunk
+                RepeatPlacer count
+                SpreadPlacer(Picker.uniformInt -3 3)
+                BoundsFilterPlacer.Instance
+                TopYPlacer.Instance
+            ]
+        this.GenerateFeatures [
+            FlowerFeature Tile.Rose, flowerPlacer(Picker.uniformInt 4 7)
+            FlowerFeature Tile.Dandelion, flowerPlacer(Picker.uniformInt 6 10)
+        ]
+
+    member private this.HideTreasures() =
+        let orePlacer chance height =
+            ChainedPlacer [
+                RepeatPlacer(Picker.uniformInt 1 6)
+                ChancePlacer chance
+                SpreadPlacer.InChunk
+                HeightPlacer(height, true)
+            ]
+        this.GenerateFeatures [
+            OreFeature(Tile.Rock, Tile.CoalOre, 0.9f, Picker.uniformInt 2 7, Picker.uniformInt 3 5, Picker.uniformInt 2 4),
+            orePlacer 0.8f (Picker.uniformInt 20 50)
+
+            OreFeature(Tile.Rock, Tile.IronOre, 0.8f, Picker.uniformInt 3 8, Picker.uniformInt 3 5, Picker.uniformInt 2 3),
+            orePlacer 0.7f (Picker.uniformInt 10 32)
+
+            OreFeature(Tile.Rock, Tile.GoldOre, 0.7f, Picker.uniformInt 1 4, Picker.uniformInt 3 5, Picker.uniformInt 2 3),
+            orePlacer 0.4f (Picker.uniformInt 0 27)
+        ]
+
     member this.Generate() =
         printfn "=== Generating level ==="
         printfn "Noise Seed: %d" parameters.NoiseSeed
@@ -122,10 +156,18 @@ type LevelGenerator(parameters: LevelGenerationParameters, level: Level) =
         recalculateHeights()
         printfn "Flooding..."
         this.Flood()
+        printfn "Planting..."
+        this.Plant()
+        printfn "Hiding treasures..."
+        this.HideTreasures()
 
-    interface IGeneratingLevelView with
+    interface IWritableGeneratingLevel with
         member _.NoiseSeed = parameters.NoiseSeed
         member _.GetTile pos = level.GetTile pos
         member _.IsAir pos = level.IsAir pos
-        member _.GetTopY x z = heights[x, z]
+        member _.GetTopY x z =
+            Level.CheckIndex "x" x (Array2D.length1 heights)
+            Level.CheckIndex "z" z (Array2D.length2 heights)
+            heights[x, z]
         member _.IsWithinBounds pos = level.IsWithinBounds pos
+        member _.SetTile pos tile = level.SetTile pos tile

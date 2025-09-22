@@ -1,15 +1,14 @@
 namespace Haukkalampi.Level.Generator.Feature
 
 open Haukkalampi.Core.Math
-open Haukkalampi.Level
 open Haukkalampi.Level.Generator
 
 [<AbstractClass>]
 type NodePathFeature(pathLength: Picker<int>) =
     abstract member MoveNode: BlockPos -> System.Random -> BlockPos
-    abstract member GenerateNode: Level -> BlockPos -> System.Random -> bool
+    abstract member GenerateNode: IWritableGeneratingLevel -> BlockPos -> System.Random -> bool
 
-    abstract member Generate: Level * BlockPos * System.Random -> unit
+    abstract member Generate: IWritableGeneratingLevel * BlockPos * System.Random -> unit
     default this.Generate(level, origin, random) =
         let pathSize = pathLength random
         let path: BlockPos array = Array.create pathSize BlockPos.Zero

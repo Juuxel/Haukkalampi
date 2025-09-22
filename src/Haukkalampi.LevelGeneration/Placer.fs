@@ -3,7 +3,7 @@ namespace Haukkalampi.Level.Generator
 open Haukkalampi.Core.Math
 
 type IPlacer =
-    abstract member Place: IGeneratingLevelView -> BlockPos -> System.Random -> BlockPos seq
+    abstract member Place: IReadableGeneratingLevel -> BlockPos -> System.Random -> BlockPos seq
 
 type ChainedPlacer(placers: IPlacer list) =
     interface IPlacer with
@@ -40,3 +40,36 @@ type AnyHeightPlacer private() =
         member _.Place level pos random =
             let next = { pos with Y = random.Next(level.GetTopY pos.X pos.Z) }
             Seq.singleton next
+
+type HeightPlacer(height: Picker<int>, clamp) =
+    interface IPlacer with
+        member _.Place level pos random =
+            let mutable y = height random
+            if clamp then
+                y <- min y (level.GetTopY pos.X pos.Z)
+            let next = { pos with Y = y }
+            Seq.singleton next
+
+type RepeatPlacer(count: Picker<int>) =
+    interface IPlacer with
+        member _.Place _ pos random =
+            let count = count random
+            Seq.replicate count pos
+
+type TopYPlacer private() =
+    static member Instance = new TopYPlacer()
+
+    interface IPlacer with
+        member _.Place level pos _ =
+            let next = { pos with Y = level.GetTopY pos.X pos.Z + 1 }
+            Seq.singleton next
+
+type BoundsFilterPlacer private() =
+    static member Instance = new BoundsFilterPlacer()
+
+    interface IPlacer with
+        member _.Place level pos _ =
+            if level.IsWithinBounds pos then
+                Seq.singleton pos
+            else
+                Seq.empty

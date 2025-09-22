@@ -28,7 +28,8 @@ type Level(size: LevelSize) =
     let mapIndex x y z =
         x + size.Width * (z + size.Depth * y)
     let tileChanged = new Event<BlockPos * Tile>()
-    let checkIndex paramName value size =
+
+    static member CheckIndex paramName value size =
         if value < 0 || value >= size then
             let msg = $"Coordinate {value} out of level bounds (0..{size - 1} expected)"
             raise(System.ArgumentOutOfRangeException(paramName, msg))
@@ -45,15 +46,15 @@ type Level(size: LevelSize) =
         0 <= pos.X && pos.X < size.Width && 0 <= pos.Y && pos.Y < size.Height && 0 <= pos.Z && pos.Z < size.Depth
 
     member _.GetTile(pos: BlockPos): Tile =
-        checkIndex "x" pos.X size.Width
-        checkIndex "y" pos.Y size.Height
-        checkIndex "z" pos.Z size.Depth
+        Level.CheckIndex "x" pos.X size.Width
+        Level.CheckIndex "y" pos.Y size.Height
+        Level.CheckIndex "z" pos.Z size.Depth
         tiles[mapIndex pos.X pos.Y pos.Z] |> int |> enum
 
     member _.SetTile (pos: BlockPos) (tile: Tile) =
-        checkIndex "x" pos.X size.Width
-        checkIndex "y" pos.Y size.Height
-        checkIndex "z" pos.Z size.Depth
+        Level.CheckIndex "x" pos.X size.Width
+        Level.CheckIndex "y" pos.Y size.Height
+        Level.CheckIndex "z" pos.Z size.Depth
         tiles[mapIndex pos.X pos.Y pos.Z] <- byte tile
         tileChanged.Trigger(pos, tile)
 

@@ -12,9 +12,8 @@
     <Compile Include="Placer.fs" />
     <Compile Include="Feature.fs" />
     <Compile Include="NodePathFeature.fs" />
-    <Compile Include="CaveFeature.fs" /><Compile Include="Flooder.fs" />
+    <Compile Include="CaveFeature.fs" /><Compile Include="OreFeature.fs" /><Compile Include="Flooder.fs" />
     <Compile Include="Generator.fs" />
-    <Compile Include="Library.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Haukkalampi.Core\Haukkalampi.Core.fsproj" />

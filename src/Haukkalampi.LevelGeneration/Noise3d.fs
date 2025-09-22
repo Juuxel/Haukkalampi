@@ -23,7 +23,7 @@ module NoiseFunction3D =
     let clampLayer3D min max (parent: NoiseFunction3D) x y z =
         parent x y z |> clamp min max
 
-    let levelBaseLayer3D (level: IGeneratingLevelView) (x: float) (y: float) (z: float) =
+    let levelBaseLayer3D (level: IReadableGeneratingLevel) (x: float) (y: float) (z: float) =
         let pos = { X = int x; Y = int y; Z = int z }
         if not(level.IsWithinBounds pos) || level.IsAir pos then
             -1.
