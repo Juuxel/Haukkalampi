@@ -6,22 +6,16 @@ open Haukkalampi.Tile
 open System.Collections.Generic
 
 type LevelSize =
-    | Tiny
-    | Small
-    | Normal
-    | Huge
-    | Massive
-    member this.AsInt =
-        match this with
-        | Tiny -> 64
-        | Small -> 128
-        | Normal -> 256
-        | Huge -> 512
-        | Massive -> 1024
-
-    member this.Width = this.AsInt
-    member _.Height = 64
-    member this.Depth = this.AsInt
+    { Width: int
+      Height: int
+      Depth: int }
+    static let create size =
+        { Width = size; Height = 64; Depth = size }
+    static member Tiny = create 64
+    static member Small = create 128
+    static member Normal = create 256
+    static member Huge = create 512
+    static member Massive = create 1024
 
 type Level(size: LevelSize) =
     let mutable tiles: byte array = Array.zeroCreate (size.Width * size.Height * size.Depth)

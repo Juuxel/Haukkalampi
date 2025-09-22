@@ -1,5 +1,6 @@
 ﻿open Haukkalampi.Core.Io
 open Haukkalampi.Core.Math
+open Haukkalampi.Core.Nbt
 open Haukkalampi.Level
 open Haukkalampi.Level.Generator
 open Haukkalampi.Player
@@ -179,23 +180,44 @@ let launchGameThread (server: Server) (connectedPlayers: IList<PlayerConnection>
 
 [<EntryPoint>]
 let main args =
-    let s = seq {
-        let mutable i = 0
-        while i < 10 do
-            i <- i + 1
-            yield i
-            yield! seq { 1..i }
-    }
-
     printfn "Starting server..."
-    let level = new Level(LevelSize.Huge)
-    let generationParams =
-        { NoiseSeed = 123
-          RandomSeed = 123
-          WaterLevel = 32 }
-    let gen = new LevelGenerator(generationParams, level)
-    gen.Generate()
-    printfn "Generated level"
+    let levelFile = "level.dat"
+    let level =
+        let level: Level option =
+            if System.IO.File.Exists levelFile then
+                use file = new System.IO.FileStream(levelFile, System.IO.FileMode.Open)
+                use gz = new GZipStream(file, CompressionMode.Decompress)
+                let input = DataReaderWriterImpl gz
+                match NbtElement.decodeNamed input |> Result.bind (fun(_, nbt) -> Storage.fromNbt nbt) with
+                | Ok level -> Some level
+                | Error _ -> None
+            else None
+        if level = None then
+            let level = new Level(LevelSize.Huge)
+            let generationParams =
+                { NoiseSeed = 123
+                  RandomSeed = 123
+                  WaterLevel = 32 }
+            let gen = new LevelGenerator(generationParams, level)
+            gen.Generate()
+            printfn "Generated level"
+            let save levelFile level =
+                printfn "Saving level..."
+                use file = new System.IO.FileStream(levelFile, System.IO.FileMode.Create)
+                use gz = new GZipStream(file, CompressionMode.Compress)
+                let output = DataReaderWriterImpl gz
+                let nbt = Storage.toNbt level
+                match nbt.EncodeNamed output "level" with
+                | Ok() ->
+                    printfn "Saved level successfully!"
+                | Error e ->
+                    match e with
+                    | WithMessage msg -> failwith $"Could not save level: {msg}"
+                    | OfException ex -> raise ex
+            save levelFile level
+            level
+        else
+            Option.get level
 
     use socket = new Socket(SocketType.Stream, ProtocolType.Tcp)
     let endPoint = new IPEndPoint(IPAddress.Parse "127.0.0.1", 7778)
