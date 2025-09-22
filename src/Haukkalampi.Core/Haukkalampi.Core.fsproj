@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    
+    <Compile Include="Result.fs" />
+    <Compile Include="Math.fs" />
+    <Compile Include="Text.fs" />
+    <Compile Include="Io.fs" />
+    <Compile Include="Nbt.fs" />
+  </ItemGroup>
+</Project>

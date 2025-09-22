@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Haukkalampi.Core/Haukkalampi.Core.fsproj" />
+    <Project Path="src/Haukkalampi.Level/Haukkalampi.Level.fsproj" />
+    <Project Path="src/Haukkalampi.LevelGeneration/Haukkalampi.LevelGeneration.fsproj" />
+    <Project Path="src/Haukkalampi.OpenSimplex2/Haukkalampi.OpenSimplex2.csproj" />
+    <Project Path="src/Haukkalampi.Protocol/Haukkalampi.Protocol.fsproj" />
+    <Project Path="src/Haukkalampi.Server/Haukkalampi.Server.fsproj" />
+  </Folder>
+</Solution>

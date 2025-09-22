@@ -1,0 +1,2 @@
+module Haukkalampi.Level.Storage
+

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="LevelGenerationCore.fs" />
+    <Compile Include="Noise2d.fs" /><Compile Include="Noise3d.fs" />
+    <Compile Include="BuiltinNoiseFunctions.fs" />
+    <Compile Include="Shapes.fs" />
+    <Compile Include="Picker.fs" />
+    <Compile Include="Placer.fs" />
+    <Compile Include="Feature.fs" />
+    <Compile Include="NodePathFeature.fs" />
+    <Compile Include="CaveFeature.fs" /><Compile Include="Flooder.fs" />
+    <Compile Include="Generator.fs" />
+    <Compile Include="Library.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Haukkalampi.Core\Haukkalampi.Core.fsproj" />
+    <ProjectReference Include="..\Haukkalampi.OpenSimplex2\Haukkalampi.OpenSimplex2.csproj" />
+    <ProjectReference Include="..\Haukkalampi.Level\Haukkalampi.Level.fsproj" />
+  </ItemGroup>
+</Project>
