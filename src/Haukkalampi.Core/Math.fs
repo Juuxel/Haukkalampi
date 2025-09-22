@@ -1,7 +1,7 @@
 module Haukkalampi.Core.Math
 
 let inline clamp a b x =
-    max a x |> min b
+    x |> max a |> min b
 
 let norm (min: float) (max: float) (value: float) =
     (value - min) / (max - min)
@@ -21,11 +21,11 @@ let easeInOut (deg: float) (x: float) =
     else
         1.0 - 0.5 * (-2.0 * x + 2.0) ** deg
 
-let inline map (startA: float) (endA: float) (startB: float) (endB: float) (x: float) =
-    (x - startA) / (endA - startA) * (endB - startB)
+let map (startA: float) (endA: float) (startB: float) (endB: float) (x: float) =
+    (x - startA) / (endA - startA) * (endB - startB) + startB
 
-let inline mapFloat32 (startA: float32) (endA: float32) (startB: float32) (endB: float32) (x: float32) =
-    (x - startA) / (endA - startA) * (endB - startB)
+let mapFloat32 (startA: float32) (endA: float32) (startB: float32) (endB: float32) (x: float32) =
+    (x - startA) / (endA - startA) * (endB - startB) + startB
 
 module FixedPoint =
     let floatToFByte(f: float32): sbyte =
