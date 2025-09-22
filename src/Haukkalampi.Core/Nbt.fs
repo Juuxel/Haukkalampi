@@ -52,7 +52,15 @@ type NbtElement =
             | NbtByteArray value ->
                 let len = List.length value
                 do! writer.WriteI32 len
-                do! writer.WriteRawBytes(Array.init len (fun i -> byte value[i]))
+                let rawBytes: byte array = Array.zeroCreate len
+                let rec convert l i =
+                    match l with
+                    | x :: xs ->
+                        rawBytes[i] <- byte x
+                        convert xs (i + 1)
+                    | _ -> ()
+                convert value 0
+                do! writer.WriteRawBytes rawBytes
             | NbtString value ->
                 do! writer.WriteMutf8String value
             | NbtList value ->
