@@ -5,12 +5,19 @@ open Haukkalampi.Level
 open Haukkalampi.Level.Generator
 open Haukkalampi.Player
 open Haukkalampi.Protocol.Packet
+open Haukkalampi.Server.Scripting
 open Haukkalampi.Tile
 open System.Collections.Generic
 open System.IO.Compression
 open System.Net
 open System.Net.Sockets
 open System.Threading
+
+let inspectType(t: System.Type) =
+    printfn "Type %O" t
+    printfn "Base type: %O" t.BaseType
+    for itf in t.GetInterfaces() do
+        printfn "  Interface: %O" itf
 
 type IServerHandle =
     abstract BroadcastMessage: Player -> string -> unit
@@ -141,9 +148,23 @@ type PlayerConnection(server: IServerHandle, level: Level, playerId: sbyte, sock
                         eprintfn $"Player loop suffered an error: {ex} - terminating"
                         state <- Disconnected
 
-type Server(connectedPlayers: IList<PlayerConnection>) =
+type Server(level: Level, connectedPlayers: IList<PlayerConnection>) as this =
     let connectedPlayers = connectedPlayers
     let messageQueue = Queue<Player * string>()
+    let tickerQueue = Queue<unit -> unit>()
+    let tickEvent = new Event<unit>()
+
+    let executeScript(engine: Microsoft.Scripting.Hosting.ScriptEngine) filePath =
+        let scope = engine.CreateScope()
+        scope.SetVariable("level", PyLevel level)
+        scope.SetVariable("server", PyServer this)
+        engine.ExecuteFile(filePath, scope) |> ignore
+
+    do
+        if System.IO.Directory.Exists "scripts" then
+            let engine = IronPython.Hosting.Python.CreateEngine()
+            System.IO.Directory.EnumerateFiles("scripts", "*.py")
+            |> Seq.iter(executeScript engine)
 
     member this.Tick() =
         let toRemove = List<PlayerConnection>()
@@ -158,6 +179,17 @@ type Server(connectedPlayers: IList<PlayerConnection>) =
 
         for player in toRemove do
             connectedPlayers.Remove player |> ignore
+
+        let count = tickerQueue.Count // don't dequeue next tick's items
+        for _ = 1 to count do
+            let ticker = tickerQueue.Dequeue()
+            ticker()
+
+        tickEvent.Trigger()
+
+    interface IScriptingServer with
+        member _.TickEvent = tickEvent.Publish
+        member _.ScheduleTick ticker = tickerQueue.Enqueue ticker
 
     interface IServerHandle with
         member _.BroadcastMessage player message = 
@@ -227,7 +259,7 @@ let main args =
 
     let mutable nextPlayerId = 0y
     let connectedPlayers = List<PlayerConnection>()
-    let server = new Server(connectedPlayers)
+    let server = new Server(level, connectedPlayers)
     launchGameThread server connectedPlayers
     level.TileChangedEvent.Add(fun(pos, tile) ->
         for player in connectedPlayers do
