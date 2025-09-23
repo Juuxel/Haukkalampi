@@ -4,3 +4,6 @@ obj/
 
 # IDE files
 .vscode/
+
+# Runtime files
+*.dat

@@ -1,5 +1,6 @@
 namespace Haukkalampi.Core.Nbt
 
+open Haukkalampi.Core.Collection
 open Haukkalampi.Core.Io
 open Haukkalampi.Core.Result
 
@@ -52,14 +53,7 @@ type NbtElement =
             | NbtByteArray value ->
                 let len = List.length value
                 do! writer.WriteI32 len
-                let rawBytes: byte array = Array.zeroCreate len
-                let rec convert l i =
-                    match l with
-                    | x :: xs ->
-                        rawBytes[i] <- byte x
-                        convert xs (i + 1)
-                    | _ -> ()
-                convert value 0
+                let rawBytes: byte array = listToArray byte value
                 do! writer.WriteRawBytes rawBytes
             | NbtString value ->
                 do! writer.WriteMutf8String value

@@ -4,7 +4,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    
+    <Compile Include="Collection.fs" />
     <Compile Include="Result.fs" />
     <Compile Include="Math.fs" />
     <Compile Include="Text.fs" />

@@ -217,6 +217,7 @@ let main args =
             save levelFile level
             level
         else
+            printfn "Loaded existing level"
             Option.get level
 
     use socket = new Socket(SocketType.Stream, ProtocolType.Tcp)

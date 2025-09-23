@@ -1,5 +1,6 @@
 module Haukkalampi.Level.Storage
 
+open Haukkalampi.Core.Collection
 open Haukkalampi.Core.Io
 open Haukkalampi.Core.Nbt
 open Haukkalampi.Core.Result
@@ -45,7 +46,7 @@ let fromNbt(nbt: NbtElement): Result<Level> =
             let! tiles = getByteArray "tiles"
             let levelSize: LevelSize = { Width = int sizeX; Height = int sizeY; Depth = int sizeZ }
             let level = new Level(levelSize)
-            level.Tiles <- Array.init (List.length tiles) (fun i -> byte tiles[i])
+            level.Tiles <- listToArray byte tiles
             return level
         }
     | _ -> Error(WithMessage $"Not an NBT compound: {nbt}")
