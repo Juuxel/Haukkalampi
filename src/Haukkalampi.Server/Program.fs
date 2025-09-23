@@ -5,6 +5,7 @@ open Haukkalampi.Level
 open Haukkalampi.Level.Generator
 open Haukkalampi.Player
 open Haukkalampi.Protocol.Packet
+open Haukkalampi.Server.Config
 open Haukkalampi.Server.Scripting
 open Haukkalampi.Tile
 open System.Collections.Generic
@@ -210,9 +211,19 @@ let launchGameThread (server: Server) (connectedPlayers: IList<PlayerConnection>
     thread.Start()
     printfn "Launched game thread"
 
+let loadConfig(): ServerConfig =
+    let path = "server.toml"
+    let seed = System.Random.Shared.Next()
+    let config: ServerConfig = { Port = 7778; Levels = [{ Seed = seed; Size = LevelSize.Huge }] }
+    let toml = Tommy.TomlTable()
+    config.WriteToml toml
+    using (System.IO.File.CreateText path) toml.WriteTo
+    config
+
 [<EntryPoint>]
 let main args =
     printfn "Starting server..."
+    let config = loadConfig()
     let levelFile = "level.dat"
     let level =
         let level: Level option =
@@ -227,8 +238,8 @@ let main args =
         if level = None then
             let level = new Level(LevelSize.Huge)
             let generationParams =
-                { NoiseSeed = 123
-                  RandomSeed = 123
+                { NoiseSeed = config.Levels[0].Seed
+                  RandomSeed = config.Levels[0].Seed
                   WaterLevel = 32 }
             let gen = new LevelGenerator(generationParams, level)
             gen.Generate()
@@ -253,7 +264,7 @@ let main args =
             Option.get level
 
     use socket = new Socket(SocketType.Stream, ProtocolType.Tcp)
-    let endPoint = new IPEndPoint(IPAddress.Parse "127.0.0.1", 7778)
+    let endPoint = new IPEndPoint(IPAddress.Parse "127.0.0.1", config.Port)
     socket.Bind endPoint
     socket.Listen 10
 

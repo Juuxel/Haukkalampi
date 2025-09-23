@@ -7,3 +7,4 @@ obj/
 
 # Runtime files
 *.dat
+*.toml
