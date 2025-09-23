@@ -1,6 +1,8 @@
 namespace Haukkalampi.Level.Generator
 
 open Haukkalampi.Core.Math
+open Haukkalampi.Level.Generator.Noise
+open Haukkalampi.Tile
 
 type IPlacer =
     abstract member Place: IReadableGeneratingLevel -> BlockPos -> System.Random -> BlockPos seq
@@ -70,6 +72,27 @@ type BoundsFilterPlacer private() =
     interface IPlacer with
         member _.Place level pos _ =
             if level.IsWithinBounds pos then
+                Seq.singleton pos
+            else
+                Seq.empty
+
+type NoiseBasedPlacer(noise: NoiseFunction, min: int, max: int) =
+    interface IPlacer with
+        member _.Place _ pos _ =
+            let noise = noise pos.X pos.Z |> clamp 0 1
+            let count = lerp min max noise |> round |> int
+            Seq.replicate count pos
+
+type PlantSoilPlacer private() =
+    let canGenerateOn tile =
+        tile = Tile.Dirt || tile = Tile.Grass
+
+    static member Instance = new PlantSoilPlacer()
+
+    interface IPlacer with
+        member _.Place level pos _ =
+            let belowPos = pos.Down
+            if level.IsAir pos && level.IsWithinBounds belowPos && canGenerateOn(level.GetTile belowPos) then
                 Seq.singleton pos
             else
                 Seq.empty

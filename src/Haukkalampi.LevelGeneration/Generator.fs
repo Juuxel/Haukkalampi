@@ -112,10 +112,19 @@ type LevelGenerator(parameters: LevelGenerationParameters, level: Level) =
                 SpreadPlacer(Picker.uniformInt -3 3)
                 BoundsFilterPlacer.Instance
                 TopYPlacer.Instance
+                PlantSoilPlacer.Instance
             ]
         this.GenerateFeatures [
             FlowerFeature Tile.Rose, flowerPlacer(Picker.uniformInt 4 7)
             FlowerFeature Tile.Dandelion, flowerPlacer(Picker.uniformInt 6 10)
+
+            TreeFeature(Picker.uniformInt 3 5, Picker.sum (Picker.binomial 1 0.85f) (Picker.constant 1)),
+            ChainedPlacer [
+                NoiseBasedPlacer(Noise.Builtin.createForestLayer parameters.NoiseSeed, 0, 3)
+                SpreadPlacer.InChunk
+                TopYPlacer.Instance
+                PlantSoilPlacer.Instance
+            ]
         ]
 
     member private this.HideTreasures() =

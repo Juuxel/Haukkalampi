@@ -43,3 +43,7 @@ let createWarpLayer (level: IReadableGeneratingLevel) seed: NoiseFunction3D =
     levelBaseLayer3D level
     |> smoothenLayer3D 4
     |> shiftLayer3D 11 4 11 shiftX shiftY shiftZ
+
+let createForestLayer seed: NoiseFunction =
+    baseLayer seed
+    |> scaleLayer 0.007 0.007
