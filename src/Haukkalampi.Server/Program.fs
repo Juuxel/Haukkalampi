@@ -143,6 +143,7 @@ type PlayerConnection(server: IServerHandle, level: Level, playerId: sbyte, sock
                 match state with
                 | Start -> this.InStartState()
                 | Ready player -> this.InReadyState player
+                | _ -> ()
             with
                 | ex ->
                     if state <> Disconnected then

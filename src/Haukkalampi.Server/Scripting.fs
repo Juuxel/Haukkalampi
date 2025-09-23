@@ -9,7 +9,7 @@ type IScriptingServer =
     abstract member ScheduleTick: (unit -> unit) -> unit
 
 type ISpreadableParams =
-    abstract member Spread: unit -> obj array
+    abstract member Spread: unit -> (obj | null) array
 
 [<Struct>]
 type Spreadable0 =
@@ -19,23 +19,25 @@ type Spreadable0 =
         member _.Spread() = Array.empty
 
 [<Struct>]
-type SpreadableN(values: obj array) =
+type SpreadableN(values: (obj | null) array) =
     interface ISpreadableParams with
         member _.Spread() = values
 
-let functionOf (value: obj) (inputs: obj array): obj =
+let functionOf (value: obj) (inputs: (obj | null) array): obj | null =
     IronPython.Runtime.Operations.PythonCalls.Call(value, inputs)
 
+#nowarn 3264 // converting to ISpreadableParams from obj | null is null-safe since :? disallows null
 type PyEvent<'T, 'U>(event: IEvent<'T>, conversion: 'T -> 'U) =
     member _.subscribe(func: obj) =
         event.Add(fun data ->
-            let converted = conversion data :> obj
+            let converted = conversion data :> obj | null
             let inputs =
                 if converted :? ISpreadableParams then
                     (converted :?> ISpreadableParams).Spread()
                 else
                     [| converted |]
             functionOf func inputs |> ignore)
+#warnon 3264
 
 type PyLevel(level: Level) =
     member val tile_changed =
