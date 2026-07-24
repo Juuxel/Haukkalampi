@@ -95,7 +95,7 @@ type LevelGenerator(parameters: LevelGenerationParameters, level: Level) =
                         level.SetTile pos tile
 
     member private _.Flood() =
-        let flooder = Flooder(level, Tile.CalmWater)
+        let flooder = Flooder(level, Tile.Water)
         for x = 0 to level.Size.Width - 1 do
             for z = 0 to level.Size.Depth - 1 do
                 let topY = heights[x, z]
