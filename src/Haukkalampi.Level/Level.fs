@@ -33,6 +33,11 @@ type Level(size: LevelSize) =
             let msg = $"Coordinate {value} out of level bounds (0..{size - 1} expected)"
             raise(System.ArgumentOutOfRangeException(paramName, msg))
 
+    static member CheckIndices (pos: BlockPos) (size: LevelSize) =
+        Level.CheckIndex "x" pos.X size.Width
+        Level.CheckIndex "y" pos.Y size.Height
+        Level.CheckIndex "z" pos.Z size.Depth
+
     [<CLIEvent>]
     member _.TileChangedEvent = tileChanged.Publish
     member _.NeighborChangedEvent = neighborChanged.Publish
@@ -46,17 +51,14 @@ type Level(size: LevelSize) =
         0 <= pos.X && pos.X < size.Width && 0 <= pos.Y && pos.Y < size.Height && 0 <= pos.Z && pos.Z < size.Depth
 
     member _.GetTile(pos: BlockPos): Tile =
-        Level.CheckIndex "x" pos.X size.Width
-        Level.CheckIndex "y" pos.Y size.Height
-        Level.CheckIndex "z" pos.Z size.Depth
+        Level.CheckIndices pos size
         tiles[mapIndex pos.X pos.Y pos.Z] |> int |> enum
 
     member _.SetTile (pos: BlockPos) (tile: Tile) =
-        Level.CheckIndex "x" pos.X size.Width
-        Level.CheckIndex "y" pos.Y size.Height
-        Level.CheckIndex "z" pos.Z size.Depth
-        let oldTile = tiles[mapIndex pos.X pos.Y pos.Z] |> int |> enum
-        tiles[mapIndex pos.X pos.Y pos.Z] <- byte tile
+        Level.CheckIndices pos size
+        let index = mapIndex pos.X pos.Y pos.Z
+        let oldTile = tiles[index] |> int |> enum
+        tiles[index] <- byte tile
         tileChanged.Trigger(pos, oldTile, tile)
 
         for side in Direction.Values do
