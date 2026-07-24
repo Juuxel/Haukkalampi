@@ -10,7 +10,7 @@ def is_water(x, y, z):
     return level.is_within_bounds(x, y, z) and level.get_tile(x, y, z) == 8
 
 def flow(x, y, z):
-    if not level.is_within_bounds(x, y, z) or level.get_tile(x, y, z) != 0:
+    if not level.is_within_bounds(x, y, z) or not level.is_air(x, y, z):
         return
     if (is_water(x, y + 1, z) or is_water(x - 1, y, z) or is_water(x + 1, y, z) or is_water(x, y, z - 1) or is_water(x, y, z + 1)) and not has_sponge_around(x, y, z):
         level.set_tile(x, y, z, 8)
@@ -37,7 +37,7 @@ def on_tile_change(x, y, z, old_tile, tile):
         server.schedule_tick(lambda: clear_water_around(x, y, z))
 
 def on_neighbor_change(x, y, z, nx, ny, nz, tile):
-    if tile == 8 and y <= ny and level.get_tile(x, y, z) == 0:
+    if tile == 8 and y <= ny and level.is_air(x, y, z):
         server.schedule_tick(lambda: level.set_tile(x, y, z, tile))
 
 print("Loading flowing water script")

@@ -65,6 +65,9 @@ type PyLevel(level: Level) =
     member _.is_within_bounds x y z =
         level.IsWithinBounds { X = x; Y = y; Z = z }
 
+    member _.is_air x y z =
+        level.IsAir { X = x; Y = y; Z = z }
+
 type PyServer(server: IScriptingServer) =
     member val tick = PyEvent(server.TickEvent, Spreadable0.Ignoring)
     member _.schedule_tick func =
