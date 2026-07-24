@@ -44,6 +44,24 @@ module FixedPoint =
     let fShortToFloat(b: int16): float32 =
         float32 b / 32f
 
+type Direction =
+    | North
+    | East
+    | South
+    | West
+    | Up
+    | Down
+    member this.Opposite =
+        match this with
+        | North -> South
+        | East -> West
+        | South -> North
+        | West -> East
+        | Up -> Down
+        | Down -> Up
+
+    static member Values = [North; East; South; West; Up; Down]
+
 [<Struct>]
 type Vec3f =
     { X: float32; Y: float32; Z: float32 }
@@ -125,6 +143,15 @@ type BlockPos =
         { X = this.X
           Y = this.Y - 1
           Z = this.Z }
+
+    member this.Offset direction =
+        match direction with
+        | North -> this.North
+        | East -> this.East
+        | South -> this.South
+        | West -> this.West
+        | Up -> this.Up
+        | Down -> this.Down
 
     static member Zero = { X = 0; Y = 0; Z = 0 }
     static member (+) (a, b) =

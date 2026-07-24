@@ -25,7 +25,8 @@ type Level(size: LevelSize) =
     let mutable tiles: byte array = Array.zeroCreate (size.Width * size.Height * size.Depth)
     let mapIndex x y z =
         x + size.Width * (z + size.Depth * y)
-    let tileChanged = new Event<BlockPos * Tile>()
+    let tileChanged = new Event<BlockPos * Tile * Tile>()
+    let neighborChanged = new Event<BlockPos * Direction * Tile>()
 
     static member CheckIndex paramName value size =
         if value < 0 || value >= size then
@@ -34,6 +35,7 @@ type Level(size: LevelSize) =
 
     [<CLIEvent>]
     member _.TileChangedEvent = tileChanged.Publish
+    member _.NeighborChangedEvent = neighborChanged.Publish
     member _.Size = size
     member _.Tiles
         with get() = tiles
@@ -53,8 +55,12 @@ type Level(size: LevelSize) =
         Level.CheckIndex "x" pos.X size.Width
         Level.CheckIndex "y" pos.Y size.Height
         Level.CheckIndex "z" pos.Z size.Depth
+        let oldTile = tiles[mapIndex pos.X pos.Y pos.Z] |> int |> enum
         tiles[mapIndex pos.X pos.Y pos.Z] <- byte tile
-        tileChanged.Trigger(pos, tile)
+        tileChanged.Trigger(pos, oldTile, tile)
+
+        for side in Direction.Values do
+            neighborChanged.Trigger(pos.Offset side, side.Opposite, tile)
 
     member this.IsAir(pos: BlockPos): bool =
         this.GetTile pos = Tile.Air

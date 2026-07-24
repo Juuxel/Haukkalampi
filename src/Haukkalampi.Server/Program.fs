@@ -277,7 +277,7 @@ let main args =
     let connectedPlayers = List<PlayerConnection>()
     let server = new Server(level, connectedPlayers)
     launchGameThread server connectedPlayers
-    level.TileChangedEvent.Add(fun(pos, tile) ->
+    level.TileChangedEvent.Add(fun(pos, _, tile) ->
         for player in connectedPlayers do
             if player.IsReady then
                 let packet = S2CPacket.SetBlock(int16 pos.X, int16 pos.Y, int16 pos.Z, byte tile)

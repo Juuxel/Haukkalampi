@@ -4,7 +4,7 @@ def fall(x, y, z, tile):
         level.set_tile(x, y - 1, z, tile)
         server.schedule_tick(lambda: fall(x, y - 1, z, tile))
 
-def on_tile_change(x, y, z, tile):
+def on_tile_change(x, y, z, old_tile, tile):
     if tile == 12 or tile == 13:
         server.schedule_tick(lambda: fall(x, y, z, tile))
 

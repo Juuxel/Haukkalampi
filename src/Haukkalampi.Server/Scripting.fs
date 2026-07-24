@@ -45,7 +45,12 @@ type PyEvent<'T, 'U>(event: IEvent<'T>, conversion: 'T -> 'U) =
 
 type PyLevel(level: Level) =
     member val tile_changed =
-        PyEvent(level.TileChangedEvent, fun(pos, tile) -> SpreadableN [| pos.X; pos.Y; pos.Z; int tile |])
+        PyEvent(level.TileChangedEvent, fun(pos, oldTile, tile) -> SpreadableN [| pos.X; pos.Y; pos.Z; int oldTile; int tile |])
+
+    member val neighbor_changed =
+        PyEvent(level.NeighborChangedEvent, fun(pos, side, tile) ->
+            let neighborPos = pos.Offset side
+            SpreadableN [| pos.X; pos.Y; pos.Z; neighborPos.X; neighborPos.Y; neighborPos.Z; int tile |])
 
     member _.width = level.Size.Width
     member _.height = level.Size.Height
